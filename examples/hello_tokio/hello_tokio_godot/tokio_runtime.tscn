@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://dvx28nop7h300"]
-
-[node name="TokioRuntime" type="TokioRuntime"]
-
-[node name="TokioTest" type="TokioTest" parent="." node_paths=PackedStringArray("runtime_node")]
-runtime_node = NodePath("..")
