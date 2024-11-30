@@ -12,12 +12,7 @@ unsafe impl ExtensionLibrary for Metaphy {
     fn on_level_init(level: InitLevel) {
         match level {
             InitLevel::Scene => {
-                let mut engine = Engine::singleton();
-
-                engine.register_singleton(
-                    GdAsyncRuntime::SINGLETON,
-                    &GdAsyncRuntime::new_alloc(),
-                );
+                Engine::singleton().register_singleton(AsyncRuntime::SINGLETON, &AsyncRuntime::new_alloc());
             }
             _ => (),
         }
@@ -28,14 +23,13 @@ unsafe impl ExtensionLibrary for Metaphy {
             InitLevel::Scene => {
                 let mut engine = Engine::singleton();
 
-                if let Some(async_singleton) = engine.get_singleton(GdAsyncRuntime::SINGLETON)
-                {
-                    engine.unregister_singleton(GdAsyncRuntime::SINGLETON);
+                if let Some(async_singleton) = engine.get_singleton(AsyncRuntime::SINGLETON) {
+                    engine.unregister_singleton(AsyncRuntime::SINGLETON);
                     async_singleton.free();
                 } else {
                     godot_warn!(
                         "Failed to find & free singleton -> {}",
-                        GdAsyncRuntime::SINGLETON
+                        AsyncRuntime::SINGLETON
                     );
                 }
             }
@@ -45,11 +39,11 @@ unsafe impl ExtensionLibrary for Metaphy {
 }
 ```
 
-And retrive the runtime in your Node(s) like so.
+Then you can access the runtime/singleton like other non-builtin engine singletons.
 
 ```rs
-let tokio = match Engine::singleton().get_singleton(GdAsyncRuntime::SINGLETON) {
-    Some(object) => object.cast::<GdAsyncRuntime>(),
-    None => return godot_error!("Failed to get singleton -> {}", GdAsyncRuntime::SINGLETON),
+let tokio = match Engine::singleton().get_singleton(AsyncRuntime::SINGLETON) {
+    Some(object) => object.cast::<AsyncRuntime>(),
+    None => return godot_error!("Failed to get singleton -> {}", AsyncRuntime::SINGLETON),
 };
 ```
