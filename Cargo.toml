@@ -2,6 +2,19 @@
 name = "godot_tokio"
 version = "0.1.1"
 edition = "2021"
+license = "MIT"
+keywords = [
+    "godot",
+    "godot4",
+    "gdext",
+    "gdextention",
+    "async",
+    "tokio",
+    "gamedev",
+]
+repository = "https://github.com/2-3-5-41/godot_tokio"
+readme = "README.md"
+description = "The tokio-async runtime wrapped in a gdextention object to be used as an engine singleton in your gdext project."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
