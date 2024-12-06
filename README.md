@@ -42,8 +42,6 @@ unsafe impl ExtensionLibrary for Metaphy {
 Then you can access the runtime/singleton like other non-builtin engine singletons.
 
 ```rs
-let tokio = match Engine::singleton().get_singleton(AsyncRuntime::SINGLETON) {
-    Some(object) => object.cast::<AsyncRuntime>(),
-    None => return godot_error!("Failed to get singleton -> {}", AsyncRuntime::SINGLETON),
-};
+let singleton_access = AsyncRuntime::singleton(); // returns an Option<Gd<AsyncRuntime>> if you need this.
+let runtime_access = AsyncRuntime::runtime(); // returns an Option<Rc<Runtime>> if you want to get to the point.
 ```
