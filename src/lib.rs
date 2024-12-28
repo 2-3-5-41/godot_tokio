@@ -58,4 +58,10 @@ impl AsyncRuntime {
             None => None,
         }
     }
+
+    /// # Panics
+    /// Just give me the runtime please!
+    pub fn runtime_please() -> Rc<Runtime> {
+        Self::runtime().unwrap()
+    }
 }
