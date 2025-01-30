@@ -19,5 +19,5 @@ multi-thread = ["tokio/rt-multi-thread"]
 crate-type = ["lib", "cdylib"]
 
 [dependencies]
-godot = "0.2.2"
-tokio = "1.42.0"
+godot = "0.2.3"
+tokio = "1.43.0"
