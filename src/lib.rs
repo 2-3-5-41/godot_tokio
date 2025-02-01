@@ -1,7 +1,15 @@
-use std::rc::Rc;
+use std::{future::Future, rc::Rc};
 
 use godot::{classes::Engine, prelude::*};
-use tokio::runtime::{self, Runtime};
+use tokio::{
+    runtime::{self, Runtime},
+    task::JoinHandle,
+};
+
+struct GodotTokio;
+
+#[gdextension]
+unsafe impl ExtensionLibrary for GodotTokio {}
 
 #[derive(GodotClass)]
 #[class(base=Object)]
@@ -36,17 +44,16 @@ impl IObject for AsyncRuntime {
 impl AsyncRuntime {
     pub const SINGLETON: &'static str = "Tokio";
 
-    /// This is here if you need it. If not, just use [`Self::runtime()`] just to get the runtime.
-    /// Returns `None` if the singleton has not been properly registered with Godot.
-    pub fn singleton() -> Option<Gd<AsyncRuntime>> {
+    /// This function has no real use for the user, only to make it easier
+    /// for this crate to access the singleton object.
+    fn singleton() -> Option<Gd<AsyncRuntime>> {
         match Engine::singleton().get_singleton(Self::SINGLETON) {
             Some(singleton) => Some(singleton.cast::<Self>()),
             None => None,
         }
     }
 
-    /// If you want to get streight to the sauce.
-    /// Returns `None` if [`Self::singleton()`] returns `None`.
+    /// Get direct access to the ref counted tokio `Runtime` if you need extra control
     pub fn runtime() -> Option<Rc<Runtime>> {
         match Self::singleton() {
             Some(singleton) => {
@@ -59,9 +66,38 @@ impl AsyncRuntime {
         }
     }
 
-    /// # Panics
-    /// Just give me the runtime please!
-    pub fn runtime_please() -> Rc<Runtime> {
-        Self::runtime().unwrap()
+    /// A wrapper function for the [`tokio::spawn`] function.
+    pub fn spawn<F>(task: F) -> Option<tokio::task::JoinHandle<<F>::Output>>
+    where
+        F: Future + Send + 'static,
+        F::Output: Send + 'static,
+    {
+        match Self::runtime() {
+            Some(rt) => Some(rt.spawn(task)),
+            None => None,
+        }
+    }
+
+    /// A wrapper function for the [`tokio::block_on`] function.
+    pub fn block_on<F>(task: F) -> Option<F::Output>
+    where
+        F: Future,
+    {
+        match Self::runtime() {
+            Some(rt) => Some(rt.block_on(task)),
+            None => None,
+        }
+    }
+
+    /// A wrapper function for the [`tokio::spawn_blocking`] function.
+    pub fn spawn_blocking<F, R>(&self, func: F) -> Option<JoinHandle<R>>
+    where
+        F: FnOnce() -> R + Send + 'static,
+        R: Send + 'static,
+    {
+        match Self::runtime() {
+            Some(rt) => Some(rt.spawn_blocking(func)),
+            None => None,
+        }
     }
 }
