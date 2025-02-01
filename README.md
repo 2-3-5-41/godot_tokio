@@ -6,8 +6,9 @@ This was made to prevent re-typing out the boilerplate for creating a tokio runt
 
 Things that changed!
 
-### 0.2.0
+### 0.2.2
 
+- Unbraking a few things (never dev while tired).
 - Removed previous functions: `singleton()`, and `runtime_please()`
 - Added wrapper functions: `spawn()`, `spawn_blocking()`, `block_on()`
 - Changed `godot` version to support `0.2.x` instead of individual patches.
