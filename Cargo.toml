@@ -1,6 +1,6 @@
 [package]
 name = "godot_tokio"
-version = "0.2.0-hotfix"
+version = "0.2.1"
 edition = "2021"
 license = "MIT"
 keywords = ["godot", "gdext", "gdextention", "async", "tokio"]
