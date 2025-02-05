@@ -15,9 +15,6 @@ default = ["multi-thread"]
 single-thread = ["tokio/rt"]
 multi-thread = ["tokio/rt-multi-thread"]
 
-[lib]
-crate-type = ["lib", "cdylib"]
-
 [dependencies]
 godot = "0.2.0"
 tokio = "1.32.0"
