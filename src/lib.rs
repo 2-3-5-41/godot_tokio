@@ -74,7 +74,7 @@ impl AsyncRuntime {
     }
 
     /// A wrapper function for the [`tokio::spawn`] function.
-    pub fn spawn<F>(future: F) -> tokio::task::JoinHandle<<F>::Output>
+    pub fn spawn<F>(future: F) -> tokio::task::JoinHandle<F::Output>
     where
         F: Future + Send + 'static,
         F::Output: Send + 'static,

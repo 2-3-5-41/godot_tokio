@@ -93,4 +93,4 @@ impl MyAsyncNode {
 ...
 ```
 
-You'll notice that there are three functions provided; you have `spawn()`, `spawn_blocking()`, and `block_on()`, they are wrappers around the regular tokio task functions so you can have a familiar API while using async rust in gdext, without having to setup the tokio runtime yourself.
+**Note**: Additional `tokio` features are not exposed through this crate, you'll want to add `tokio` >= `1.32.0` to your crate in order to enable additional `tokio` features.
