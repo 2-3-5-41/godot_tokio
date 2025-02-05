@@ -48,51 +48,54 @@ impl AsyncRuntime {
         }
     }
 
-    /// Get direct access to the ref counted tokio `Runtime` if you need extra control
-    pub fn runtime() -> Option<Rc<Runtime>> {
+    /// **Can Panic**
+    ///
+    /// Gets the active runtime under the [`AsyncRuntime`] singleton. This can panic if the singleton is unreachable,
+    /// or has no ability to be registered by the engine.
+    pub fn runtime() -> Rc<Runtime> {
         match Self::singleton() {
             Some(singleton) => {
                 let bind = singleton.bind();
-                let rt = Rc::clone(&bind.runtime);
-
-                Some(rt)
+                Rc::clone(&bind.runtime)
             }
-            None => None,
+            None => {
+                // Assuming the user forgot to register the singleton, let's do it for them as a fail safe.
+                Engine::singleton()
+                    .register_singleton(AsyncRuntime::SINGLETON, &AsyncRuntime::new_alloc());
+
+                // We can panic here because something fundementally wrong has happend.
+                let singleton = Self::singleton()
+                    .expect("Engine was not able to register, or get `AsyncRuntime` singleton!");
+
+                let bind = singleton.bind();
+                Rc::clone(&bind.runtime)
+            }
         }
     }
 
     /// A wrapper function for the [`tokio::spawn`] function.
-    pub fn spawn<F>(task: F) -> Option<tokio::task::JoinHandle<<F>::Output>>
+    pub fn spawn<F>(future: F) -> tokio::task::JoinHandle<<F>::Output>
     where
         F: Future + Send + 'static,
         F::Output: Send + 'static,
     {
-        match Self::runtime() {
-            Some(rt) => Some(rt.spawn(task)),
-            None => None,
-        }
+        Self::runtime().spawn(future)
     }
 
     /// A wrapper function for the [`tokio::block_on`] function.
-    pub fn block_on<F>(task: F) -> Option<F::Output>
+    pub fn block_on<F>(future: F) -> F::Output
     where
         F: Future,
     {
-        match Self::runtime() {
-            Some(rt) => Some(rt.block_on(task)),
-            None => None,
-        }
+        Self::runtime().block_on(future)
     }
 
     /// A wrapper function for the [`tokio::spawn_blocking`] function.
-    pub fn spawn_blocking<F, R>(&self, func: F) -> Option<JoinHandle<R>>
+    pub fn spawn_blocking<F, R>(&self, func: F) -> JoinHandle<R>
     where
         F: FnOnce() -> R + Send + 'static,
         R: Send + 'static,
     {
-        match Self::runtime() {
-            Some(rt) => Some(rt.spawn_blocking(func)),
-            None => None,
-        }
+        Self::runtime().spawn_blocking(func)
     }
 }

@@ -6,14 +6,11 @@ This was made to prevent re-typing out the boilerplate for creating a tokio runt
 
 Things that changed!
 
-### 0.2.2
+### 0.3.0
 
-- Unbraking a few things (never dev while tired).
-- Removed previous functions: `singleton()`, and `runtime_please()`
-- Added wrapper functions: `spawn()`, `spawn_blocking()`, `block_on()`
-- Changed `godot` version to support `0.2.x` instead of individual patches.
-- Changed `tokio` version to support `1.32.x` for support of older versions of tokio (if it's needed?).
-- Hopefully a better readme.
+- `runtime()` can now panic, but only if the Godot engine, is unable to register the `AsyncRuntime` singleton.
+  - This is due to the function now attempting to register the singleton itself if it wasn't before; this is a 'fail safe', so I'd *recommend* registering your singleton(s) in `on_level_init` instead of having `AsyncRuntime::runtime()` do it for you.
+- wrapper functions are technically 1:1 with how you would interact with them outside gdext context, including their return type.
 
 ## Getting started
 
